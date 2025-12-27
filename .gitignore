@@ -26,6 +26,10 @@ venv/
 ENV/
 env/
 
+# Claude
+.claude
+.specify
+
 # IDE
 .idea/
 .vscode/
