@@ -109,8 +109,27 @@ uv run pytest tests/ -v
 
 ### Building Executable
 
+Executables must be built on the target platform (PyInstaller does not support cross-compilation).
+
+#### Windows
+
 ```bash
-uv run pyinstaller --onefile --windowed --name rf_serial_gui \
+uv run pyinstaller --onefile --windowed --name rf_serial_gui ^
+    --paths src/rf_serial_gui ^
+    --hidden-import config ^
+    --hidden-import gui ^
+    --hidden-import serial_handler ^
+    --hidden-import validator ^
+    src/rf_serial_gui/main.py
+
+# Copy to project root
+copy dist\rf_serial_gui.exe .
+```
+
+#### Linux
+
+```bash
+uv run pyinstaller --onefile --name rf_serial_gui \
     --paths src/rf_serial_gui \
     --hidden-import config \
     --hidden-import gui \
@@ -119,7 +138,26 @@ uv run pyinstaller --onefile --windowed --name rf_serial_gui \
     src/rf_serial_gui/main.py
 
 # Copy to project root
-cp dist/rf_serial_gui.exe .
+cp dist/rf_serial_gui .
+
+# Make executable (if needed)
+chmod +x rf_serial_gui
+```
+
+#### Linux via Docker (from Windows)
+
+```bash
+docker run --rm -v "$(pwd):/app" -w /app python:3.11 bash -c "
+    pip install pyinstaller pyserial &&
+    pyinstaller --onefile --name rf_serial_gui_linux \
+        --paths src/rf_serial_gui \
+        --hidden-import config \
+        --hidden-import gui \
+        --hidden-import serial_handler \
+        --hidden-import validator \
+        src/rf_serial_gui/main.py
+"
+cp dist/rf_serial_gui_linux .
 ```
 
 ## Project Structure
